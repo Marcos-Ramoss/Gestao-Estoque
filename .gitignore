@@ -1,0 +1,27 @@
+/target/
+/docs/
+/logs/
+/.idea/
+/.vscode/
+/out/
+/bin/
+/node_modules/
+/dist/
+/build/
+/.env
+/.DS_Store
+/.classpath
+/.project
+/.settings/
+/*.iml
+# Arquivos de cache do Maven
+/.mvn/
+/.mvn/wrapper/maven-wrapper.jar
+# Arquivos de cache do IntelliJ
+/.gradle/
+/.gradle/
+/*.log
+# Arquivos de cache do Angular
+/frontend/node_modules/
+/frontend/dist/
+/frontend/.angular/cache/

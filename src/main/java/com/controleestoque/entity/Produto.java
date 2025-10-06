@@ -1,0 +1,75 @@
+package com.controleestoque.entity;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Entity
+@Table(name = "produtos")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Produto {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false, length = 255)
+    private String nome;
+    
+    @Column(columnDefinition = "TEXT")
+    private String descricao;
+    
+    @Column(nullable = false, unique = true, length = 100)
+    private String sku;
+    
+    @Column(name = "preco_custo", nullable = false, precision = 10, scale = 2)
+    private BigDecimal precoCusto;
+    
+    @Column(name = "preco_venda", nullable = false, precision = 10, scale = 2)
+    private BigDecimal precoVenda;
+    
+    @Column(name = "estoque_atual", nullable = false)
+    @Builder.Default
+    private Integer estoqueAtual = 0;
+    
+    @Column(name = "estoque_minimo", nullable = false)
+    @Builder.Default
+    private Integer estoqueMinimo = 0;
+    
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean ativo = true;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "categoria_id", nullable = false)
+    private Categoria categoria;
+    
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+    
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+    
+    @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<MovimentacaoEstoque> movimentacoes;
+    
+    @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Venda> vendas;
+}
+
+
+
+

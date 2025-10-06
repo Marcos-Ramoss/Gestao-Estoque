@@ -1,0 +1,63 @@
+spring:
+  application:
+    name: controle-estoque
+  
+  profiles:
+    active: default
+  
+  datasource:
+    url: jdbc:mysql://localhost:3306/controle_estoque?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: app_user
+    password: app_password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+  
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  
+  security:
+    jwt:
+      secret: sua-chave-secreta-super-segura-com-pelo-menos-32-caracteres-para-jwt
+      expiration: 86400000 # 24 horas em millisegundos
+  
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+  
+logging:
+  level:
+    com.controleestoque: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
