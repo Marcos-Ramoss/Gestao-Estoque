@@ -22,6 +22,8 @@ public interface VendaRepository extends JpaRepository<Venda, Long> {
     
     List<Venda> findByVendedorOrderByDataDesc(Usuario vendedor);
     
+    Page<Venda> findByVendedorOrderByDataDesc(Usuario vendedor, Pageable pageable);
+    
     @Query("SELECT v FROM Venda v WHERE " +
            "(:produtoId IS NULL OR v.produto.id = :produtoId) AND " +
            "(:vendedorId IS NULL OR v.vendedor.id = :vendedorId) AND " +
