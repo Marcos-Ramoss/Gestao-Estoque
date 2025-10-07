@@ -7,6 +7,7 @@ import com.controleestoque.dto.mapper.ComissaoMapper;
 import com.controleestoque.dto.request.CalcularComissaoRequest;
 import com.controleestoque.dto.response.ComissaoResponse;
 import com.controleestoque.dto.response.RelatorioComissaoResponse;
+import com.controleestoque.dto.response.VendedorResponse;
 import com.controleestoque.entity.Usuario;
 import com.controleestoque.entity.Venda;
 import com.controleestoque.exception.ResourceNotFoundException;
@@ -212,13 +213,20 @@ public class ComissaoService {
      * Lista todos os vendedores que têm comissões
      */
     @Transactional(readOnly = true)
-    public List<Usuario> listarVendedoresComComissoes() {
+    public List<VendedorResponse> listarVendedoresComComissoes() {
         log.info("Listando vendedores com comissões");
         
         return vendaRepository.findAll()
                 .stream()
                 .map(Venda::getVendedor)
                 .distinct()
+                .map(vendedor -> VendedorResponse.builder()
+                        .id(vendedor.getId())
+                        .nome(vendedor.getNome())
+                        .email(vendedor.getEmail())
+                        .role(vendedor.getRole().name())
+                        .ativo(vendedor.getAtivo())
+                        .build())
                 .collect(Collectors.toList());
     }
 }

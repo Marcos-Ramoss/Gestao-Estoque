@@ -6,7 +6,7 @@ import com.controleestoque.dto.PaginationDto;
 import com.controleestoque.dto.request.CalcularComissaoRequest;
 import com.controleestoque.dto.response.ComissaoResponse;
 import com.controleestoque.dto.response.RelatorioComissaoResponse;
-import com.controleestoque.entity.Usuario;
+import com.controleestoque.dto.response.VendedorResponse;
 import com.controleestoque.service.ComissaoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -20,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -45,15 +46,19 @@ public class ComissaoController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('VENDEDOR')")
     public ResponseEntity<BigDecimal> calcularComissaoTotal(
             @PathVariable Long vendedorId,
-            @Parameter(description = "Data de início (formato: yyyy-MM-dd'T'HH:mm:ss)")
+            @Parameter(description = "Data de início (formato: yyyy-MM-dd)")
             @RequestParam(required = false) 
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataInicio,
-            @Parameter(description = "Data de fim (formato: yyyy-MM-dd'T'HH:mm:ss)")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @Parameter(description = "Data de fim (formato: yyyy-MM-dd)")
             @RequestParam(required = false) 
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataFim) {
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim) {
+        
+        // Converter LocalDate para LocalDateTime
+        LocalDateTime inicio = dataInicio != null ? dataInicio.atStartOfDay() : null;
+        LocalDateTime fim = dataFim != null ? dataFim.atTime(23, 59, 59) : null;
         
         RelatorioComissaoResponse relatorio = comissaoService.gerarRelatorioComissoesPorVendedor(
-                vendedorId, dataInicio, dataFim);
+                vendedorId, inicio, fim);
         return ResponseEntity.ok(relatorio.getComissaoTotal());
     }
 
@@ -85,7 +90,7 @@ public class ComissaoController {
             @RequestParam(defaultValue = "10") int limit,
             
             @Parameter(description = "Campo para ordenação")
-            @RequestParam(defaultValue = "dataVenda") String orderBy,
+            @RequestParam(defaultValue = "data") String orderBy,
             
             @Parameter(description = "Direção da ordenação (asc/desc)")
             @RequestParam(defaultValue = "desc") String orderDirection) {
@@ -119,7 +124,7 @@ public class ComissaoController {
             @Parameter(description = "Quantidade por página")
             @RequestParam(defaultValue = "10") int limit,
             @Parameter(description = "Campo para ordenação")
-            @RequestParam(defaultValue = "dataVenda") String orderBy,
+            @RequestParam(defaultValue = "data") String orderBy,
             @Parameter(description = "Direção da ordenação (asc/desc)")
             @RequestParam(defaultValue = "desc") String orderDirection) {
         
@@ -139,15 +144,19 @@ public class ComissaoController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('VENDEDOR')")
     public ResponseEntity<RelatorioComissaoResponse> gerarRelatorioComissoesPorVendedor(
             @PathVariable Long vendedorId,
-            @Parameter(description = "Data de início (formato: yyyy-MM-dd'T'HH:mm:ss)")
+            @Parameter(description = "Data de início (formato: yyyy-MM-dd)")
             @RequestParam(required = false) 
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataInicio,
-            @Parameter(description = "Data de fim (formato: yyyy-MM-dd'T'HH:mm:ss)")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @Parameter(description = "Data de fim (formato: yyyy-MM-dd)")
             @RequestParam(required = false) 
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataFim) {
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim) {
+        
+        // Converter LocalDate para LocalDateTime
+        LocalDateTime inicio = dataInicio != null ? dataInicio.atStartOfDay() : null;
+        LocalDateTime fim = dataFim != null ? dataFim.atTime(23, 59, 59) : null;
         
         RelatorioComissaoResponse relatorio = comissaoService.gerarRelatorioComissoesPorVendedor(
-                vendedorId, dataInicio, dataFim);
+                vendedorId, inicio, fim);
         return ResponseEntity.ok(relatorio);
     }
 
@@ -162,8 +171,8 @@ public class ComissaoController {
     @GetMapping("/vendedores")
     @Operation(summary = "Listar vendedores com comissões", description = "Retorna lista de vendedores que possuem comissões")
     @PreAuthorize("hasRole('ADMIN') or hasRole('VENDEDOR')")
-    public ResponseEntity<List<Usuario>> listarVendedoresComComissoes() {
-        List<Usuario> vendedores = comissaoService.listarVendedoresComComissoes();
+    public ResponseEntity<List<VendedorResponse>> listarVendedoresComComissoes() {
+        List<VendedorResponse> vendedores = comissaoService.listarVendedoresComComissoes();
         return ResponseEntity.ok(vendedores);
     }
 }
